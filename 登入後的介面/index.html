@@ -1,0 +1,182 @@
+<!DOCTYPE html>
+<html>
+    <head>
+        <meta charset="UTF-8">
+        <title>查找與刪除帳號資料</title>
+        <style>
+            body {
+                font-family: Arial, sans-serif;
+                background-color: #f9f9f9;
+                margin: 0;
+                padding: 20px;
+                display: flex;
+                flex-direction: column;
+                align-items: center;
+            }
+            h1 {
+                color: #4CAF50;
+            }
+            .logout-btn {
+                position: absolute;
+                top: 20px;
+                right: 20px;
+                background-color: #f44336;
+                color: white;
+                border: none;
+                padding: 10px 20px;
+                border-radius: 5px;
+                cursor: pointer;
+                font-size: 14px;
+            }
+            .logout-btn:hover {
+                background-color: #d32f2f;
+            }
+            form {
+                margin-bottom: 20px;
+                background: #ffffff;
+                padding: 20px;
+                border-radius: 10px;
+                box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+            }
+            label {
+                display: block;
+                margin-bottom: 10px;
+                font-weight: bold;
+            }
+            input[type="text"] {
+                width: 90%;
+                padding: 10px;
+                margin-bottom: 10px;
+                border: 1px solid #ccc;
+                border-radius: 5px;
+            }
+            button {
+                background-color: #4CAF50;
+                color: white;
+                border: none;
+                padding: 10px 20px;
+                border-radius: 5px;
+                cursor: pointer;
+            }
+            button:hover {
+                background-color: #45a049;
+            }
+            #result {
+                width: 100%;
+                max-width: 800px;
+                margin-top: 20px;
+            }
+            table {
+                width: 100%;
+                border-collapse: collapse;
+                background: #ffffff;
+                border-radius: 10px;
+                box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+            }
+            th, td {
+                padding: 15px;
+                text-align: left;
+                border-bottom: 1px solid #ddd;
+            }
+            th {
+                background-color: #f2f2f2;
+            }
+        </style>
+    </head>
+    <body>
+        <!-- 登出按鈕 -->
+        <button class="logout-btn" onclick="logout()">登出</button>
+
+        <h1>查找與刪除帳號資料</h1>
+
+        <!-- 查找功能 -->
+        <form id="searchForm">
+            <label for="searchInput">輸入帳號或電子郵件關鍵字:</label>
+            <input type="text" id="searchInput" name="query" placeholder="輸入帳號或電子郵件" required>
+            <button type="submit">查找</button>
+        </form>
+
+        <!-- 刪除功能 -->
+        <form id="deleteForm">
+            <label for="deleteInput">輸入帳號以刪除:</label>
+            <input type="text" id="deleteInput" name="username" placeholder="輸入帳號" required>
+            <button type="submit">刪除</button>
+        </form>
+
+        <h2>查詢結果:</h2>
+        <div id="result"></div>
+
+        <script>
+            // 登出功能
+            const logout = () => {
+                // 可修改以下行以跳轉到登出頁面或清除認證資料
+                alert('已登出！');
+                window.location.href = '../登入網站.html'; // 導向到登出路徑
+            };
+
+            // 清空結果顯示
+            const clearResults = () => {
+                document.getElementById('result').innerHTML = '';
+            };
+
+            // 格式化日期函數
+            const formatDate = (isoString) => {
+                const date = new Date(isoString);
+                return `${date.getFullYear()}年${date.getMonth() + 1}月${date.getDate()}日 ${date.getHours()}:${date.getMinutes()}:${date.getSeconds()}`;
+            };
+
+            // 查找功能
+            document.getElementById('searchForm').addEventListener('submit', async (event) => {
+                event.preventDefault();
+                clearResults();
+                const query = document.getElementById('searchInput').value;
+                const response = await fetch(`http://localhost:3001/search?query=${encodeURIComponent(query)}`);
+                const data = await response.json();
+
+                if (Array.isArray(data) && data.length > 0) {
+                    const table = document.createElement('table');
+                    table.innerHTML = `
+                        <thead>
+                            <tr>
+                                <th>ID</th>
+                                <th>帳號</th>
+                                <th>電子郵件</th>
+                                <th>密碼</th>
+                                <th>註冊時間</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            ${data.map(user => `
+                                <tr>
+                                    <td>${user.id}</td>
+                                    <td>${user.username}</td>
+                                    <td>${user.email}</td>
+                                    <td>${user.password}</td>
+                                    <td>${formatDate(user.created_at)}</td>
+                                </tr>
+                            `).join('')}
+                        </tbody>
+                    `;
+                    document.getElementById('result').appendChild(table);
+                } else {
+                    document.getElementById('result').textContent = '未找到符合的資料!';
+                }
+            });
+
+
+            // 刪除功能
+            document.getElementById('deleteForm').addEventListener('submit', async (event) => {
+                event.preventDefault();
+                clearResults();
+                const username = document.getElementById('deleteInput').value;
+                const response = await fetch(`http://localhost:3001/delete`, {
+                    method: 'DELETE',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ username }),
+                });
+                const message = await response.text();
+                document.getElementById('result').textContent = message;
+            });
+        </script>
+    </body>
+</html>

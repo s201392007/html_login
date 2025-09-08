@@ -1,0 +1,8 @@
+參考網址：
+https://ithelp.ithome.com.tw/articles/10323581
+https://ithelp.ithome.com.tw/articles/10186139
+
+註：
+1.記得搜尋找"服務"打開，然後把SQL相關的設定都要改成"已啟用"
+2.去SQL server設定管理員 把通訊協定TCP/IP"已啟用"
+3.SQL server服務的設定都要改成自動

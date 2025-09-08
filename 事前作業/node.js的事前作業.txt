@@ -1,0 +1,9 @@
+1. 去https://nodejs.org/zh-tw/download/prebuilt-installer 下載node.js
+
+2.去CMD（命令提示字元）並開啟，輸入Node -v，檢查我們Node.js是否安裝成功
+
+3.輸入npm install vue，開始安裝Vue
+
+4.再輸入npm install -g @vue/cli，安裝Vue CLI
+
+5.再輸入npm install express mssql cors，才能連線到資料庫

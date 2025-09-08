@@ -1,0 +1,96 @@
+<!DOCTYPE html>
+<html lang="zh-Hant">
+    <head>
+        <meta charset="UTF-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        <title>登入頁面</title>
+        <style>
+            body {
+                font-family: Arial, Helvetica, sans-serif;
+                margin: 0;
+                background-image: url('IMG_7781.jpg');
+                background-size: cover;
+                background-position: center;
+                background-repeat: no-repeat;
+            }
+            form{
+                max-width: 400px;
+                margin: auto;
+                padding: 70px;
+                background: rgba(255, 255, 255, 0.8);
+                border-radius: 50px;
+            }
+            input{
+                display: block;
+                margin-bottom: 20px;
+                width: 100%;
+                padding: 10px;
+            }
+            button{
+                padding: 20px;
+                background: #A53212;
+                color: white;
+                border: none;
+                cursor: pointer;
+            }
+            button:hover{
+                background: #74240e;
+            }
+            h1{
+                text-align: center;
+                color: #FFD700;
+                text-shadow: 5px 5px 5px rgba(0, 0, 0, 0.6);
+            }
+            </style>
+    </head>
+    <body>
+        <h1 style="text-align: center; color: white;">登入網站</h1>
+        <form id="loginForm">
+            <h4>帳號<input type="text" name="username" placeholder="帳號" required /></h4>
+            <h4>密碼<input type="password" name="password" placeholder="密碼" required /></h4>
+            <button type="submit">登入</button>
+            <p style="text-align: center;">
+                <a href="海螺註冊畫面.html">沒帳號?那註冊:P</a>
+            </p>
+        </form>
+
+        <script>
+            document.getElementById('loginForm').addEventListener('submit', async (e) => {
+                e.preventDefault();
+                const formData = new FormData(e.target);
+                const data = Object.fromEntries(formData.entries());
+                
+                try{
+                    alert("登入中...");
+                    const response = await fetch('http://localhost:3001/login',{
+                        method: 'POST',
+                        headers: {
+                            'Content-Type': 'application/json'
+                        },
+                        body: JSON.stringify(data),
+                    });
+                    if (response.ok){
+                        alert('登入成功!');
+                        window.location.href = '登入後的介面/index.html'; //跳轉到主頁
+                    }
+                    else {
+                        const error = await response.text();
+                        if (error.includes('帳號不存在')) {
+                            alert('查無此帳號，請重新輸入!');
+                        } 
+                        else if (error.includes('密碼錯誤')) {
+                            alert('密碼錯誤，請再試一次!');
+                        } 
+                        else {
+                            alert('登入失敗，請稍後再試!');
+                        }
+                    }
+                }
+                catch(err){
+                    console.error('錯誤:', err);
+                    alert("伺服器無回應，請稍後再試!");
+                }
+            })
+        </script>
+    </body>
+</html>
